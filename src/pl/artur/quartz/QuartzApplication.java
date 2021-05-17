@@ -4,7 +4,7 @@ import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -13,12 +13,17 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.EnumSet;
 import java.util.List;
-
-import static java.time.DayOfWeek.SATURDAY;
-import static java.time.DayOfWeek.SUNDAY;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SpringBootApplication
 public class QuartzApplication {
+
+    @Value("${fire-days}")
+    private List<DayOfWeek> fireDays;
+
+    @Value("${fire-times}")
+    private List<LocalTime> fireTimes;
 
     public static void main(String[] args) {
         SpringApplication.run(QuartzApplication.class, args);
@@ -35,9 +40,6 @@ public class QuartzApplication {
 
     @Bean
     public Trigger trigger2(JobDetail jobDetail) {
-        List<LocalTime> fireTimes = List.of(LocalTime.of(14, 02), LocalTime.of(14, 03), LocalTime.of(14, 04));
-        EnumSet<DayOfWeek> fireDays = EnumSet.of(SATURDAY, SUNDAY);
-
         return TriggerBuilder.newTrigger().forJob(jobDetail)
                              .withIdentity("TRIGGER")
                              .withDescription("Sample trigger")

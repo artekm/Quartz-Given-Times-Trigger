@@ -4,13 +4,10 @@ import org.quartz.Calendar;
 import org.quartz.ScheduleBuilder;
 import org.quartz.impl.triggers.AbstractTrigger;
 import org.quartz.impl.triggers.CoreTrigger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +19,7 @@ public class GivenTimesTriggerImpl extends AbstractTrigger<GivenTimesTrigger> im
     private Date previousFireTime;
 
     private List<LocalTime> fireTimes;
-    private EnumSet<DayOfWeek> fireDays;
+    private List<DayOfWeek> fireDays;
 
     private boolean continueToday = true;
 
@@ -200,14 +197,15 @@ public class GivenTimesTriggerImpl extends AbstractTrigger<GivenTimesTrigger> im
     }
 
     @Override
-    public EnumSet<DayOfWeek> getFireDays() {
-        return fireDays.clone();
+    public List<DayOfWeek> getFireDays() {
+        return fireDays.stream().map(DayOfWeek::from).collect(Collectors.toList());
+
     }
 
     @Override
-    public void setFireDays(EnumSet<DayOfWeek> fireDays) {
+    public void setFireDays(List<DayOfWeek> fireDays) {
         if (fireDays != null) {
-            this.fireDays = fireDays.clone();
+            this.fireDays = fireDays.stream().map(DayOfWeek::from).collect(Collectors.toList());
         }
     }
 

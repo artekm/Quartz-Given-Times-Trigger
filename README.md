@@ -11,3 +11,5 @@ jobStore, trigger data is kept in QRTZ_SIMPROP_TRIGGERS table.
 You need to define in builder:
 - a list of LocalTime as fireTimes
 - a EnumSet<DayOfWeek> as fireDays
+
+Please look at QuartzApplication class for usage example.

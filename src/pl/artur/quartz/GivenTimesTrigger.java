@@ -17,7 +17,7 @@ public interface GivenTimesTrigger extends Trigger {
     boolean continueToday();
     List<LocalTime> getFireTimes();
     void setFireTimes(List<LocalTime> fireTimes);
-    EnumSet<DayOfWeek> getFireDays();
-    void setFireDays(EnumSet<DayOfWeek> fireDays);
+    List<DayOfWeek> getFireDays();
+    void setFireDays(List<DayOfWeek> fireDays);
     TriggerBuilder<GivenTimesTrigger> getTriggerBuilder();
 }

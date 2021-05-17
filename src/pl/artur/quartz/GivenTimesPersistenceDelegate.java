@@ -4,13 +4,15 @@ import org.quartz.ScheduleBuilder;
 import org.quartz.impl.jdbcjobstore.SimplePropertiesTriggerPersistenceDelegateSupport;
 import org.quartz.impl.jdbcjobstore.SimplePropertiesTriggerProperties;
 import org.quartz.spi.OperableTrigger;
+import org.springframework.core.ResolvableType;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.TypeDescriptor;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GivenTimesPersistenceDelegate extends SimplePropertiesTriggerPersistenceDelegateSupport {
 
@@ -22,7 +24,7 @@ public class GivenTimesPersistenceDelegate extends SimplePropertiesTriggerPersis
         SimplePropertiesTriggerProperties props = new SimplePropertiesTriggerProperties();
 
         props.setString1(calTrig.getFireTimes().stream().map(LocalTime::toString).collect(Collectors.joining(",")));
-        props.setString2(calTrig.getFireDays().stream().map(Enum::toString).collect(Collectors.joining(",")));
+        props.setString2(calTrig.getFireDays().stream().map(DayOfWeek::toString).collect(Collectors.joining(",")));
 
         props.setBoolean1(calTrig.continueToday());
         return props;
@@ -30,12 +32,12 @@ public class GivenTimesPersistenceDelegate extends SimplePropertiesTriggerPersis
 
     @Override
     protected TriggerPropertyBundle getTriggerPropertyBundle(SimplePropertiesTriggerProperties properties) {
-        List<LocalTime> fireTimes = Arrays.stream(properties.getString1().split(","))
+        List<LocalTime> fireTimes = Stream.of(properties.getString1().split(","))
                                           .map(LocalTime::parse)
                                           .collect(Collectors.toList());
-        EnumSet<DayOfWeek> fireDays = Arrays.stream(properties.getString2().split(","))
-                                            .map(DayOfWeek::valueOf)
-                                            .collect(Collectors.toCollection(() -> EnumSet.noneOf(DayOfWeek.class)));
+        List<DayOfWeek> fireDays = Stream.of(properties.getString2().split(","))
+                                         .map(DayOfWeek::valueOf)
+                                         .collect(Collectors.toList());
 
         ScheduleBuilder<?> sb = GivenTimesScheduleBuilder.givenTimesSchedule()
                                                          .withFireDays(fireDays)

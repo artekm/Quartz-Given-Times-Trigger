@@ -12,7 +12,7 @@ import static org.quartz.Trigger.MISFIRE_INSTRUCTION_SMART_POLICY;
 
 public class GivenTimesScheduleBuilder extends ScheduleBuilder<GivenTimesTrigger> {
     private List<LocalTime> fireTimes;
-    private EnumSet<DayOfWeek> fireDays;
+    private List<DayOfWeek> fireDays;
     private int misfireInstruction = MISFIRE_INSTRUCTION_SMART_POLICY;
 
     protected GivenTimesScheduleBuilder() {
@@ -31,7 +31,7 @@ public class GivenTimesScheduleBuilder extends ScheduleBuilder<GivenTimesTrigger
         return this;
     }
 
-    public GivenTimesScheduleBuilder withFireDays(EnumSet<DayOfWeek> fireDays) {
+    public GivenTimesScheduleBuilder withFireDays(List<DayOfWeek> fireDays) {
         if ((fireDays == null) || (fireDays.isEmpty())) {
             throw new RuntimeException("Fire days list must not be null nor empty");
         }
