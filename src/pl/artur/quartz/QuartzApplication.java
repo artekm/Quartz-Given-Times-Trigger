@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.format.support.DefaultFormattingConversionService;
+import org.springframework.format.support.FormattingConversionService;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -27,6 +31,19 @@ public class QuartzApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(QuartzApplication.class, args);
+    }
+
+    @Bean
+    public static ConversionService conversionService() {
+        // Ten konwerter jest potrzebny, bo domyslny springowy nie umie czytać LocalTime z sekundami
+        FormattingConversionService reg = new DefaultFormattingConversionService();
+        reg.addConverter(new Converter<String, LocalTime>(){
+            @Override
+            public LocalTime convert(String source) {
+                return LocalTime.parse(source);
+            }
+        }); // z jakiegoś tajemniczego powodu przestaje działać po zmianie na lambdę, więc zostaje jako klasa anonimowa
+        return reg;
     }
 
     @Bean

@@ -4,9 +4,6 @@ import org.quartz.ScheduleBuilder;
 import org.quartz.impl.jdbcjobstore.SimplePropertiesTriggerPersistenceDelegateSupport;
 import org.quartz.impl.jdbcjobstore.SimplePropertiesTriggerProperties;
 import org.quartz.spi.OperableTrigger;
-import org.springframework.core.ResolvableType;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.TypeDescriptor;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -16,15 +13,18 @@ import java.util.stream.Stream;
 
 public class GivenTimesPersistenceDelegate extends SimplePropertiesTriggerPersistenceDelegateSupport {
 
+    // You must order Quartz to load this class by adding to your application.yaml:
+    // spring.quartz.properties.org.quartz.jobStore.driverDelegateInitString: triggerPersistenceDelegateClasses=GivenTimesPersistenceDelegate
+
     @Override
     protected SimplePropertiesTriggerProperties getTriggerProperties(OperableTrigger trigger) {
 
-        GivenTimesTriggerImpl calTrig = (GivenTimesTriggerImpl) trigger;
+        GivenTimesTrigger calTrig = (GivenTimesTrigger) trigger;
 
         SimplePropertiesTriggerProperties props = new SimplePropertiesTriggerProperties();
 
         props.setString1(calTrig.getFireTimes().stream().map(LocalTime::toString).collect(Collectors.joining(",")));
-        props.setString2(calTrig.getFireDays().stream().map(DayOfWeek::toString).collect(Collectors.joining(",")));
+        props.setString2(calTrig.getFireDays().stream().map(Enum::toString).collect(Collectors.joining(",")));
 
         props.setBoolean1(calTrig.continueToday());
         return props;
@@ -36,8 +36,8 @@ public class GivenTimesPersistenceDelegate extends SimplePropertiesTriggerPersis
                                           .map(LocalTime::parse)
                                           .collect(Collectors.toList());
         List<DayOfWeek> fireDays = Stream.of(properties.getString2().split(","))
-                                         .map(DayOfWeek::valueOf)
-                                         .collect(Collectors.toList());
+                                            .map(DayOfWeek::valueOf)
+                                            .collect(Collectors.toList());
 
         ScheduleBuilder<?> sb = GivenTimesScheduleBuilder.givenTimesSchedule()
                                                          .withFireDays(fireDays)
@@ -52,12 +52,12 @@ public class GivenTimesPersistenceDelegate extends SimplePropertiesTriggerPersis
 
     @Override
     public boolean canHandleTriggerType(OperableTrigger trigger) {
-        return ((trigger instanceof GivenTimesTriggerImpl) && !((GivenTimesTriggerImpl) trigger)
+        return ((trigger instanceof GivenTimesTrigger) && !((GivenTimesTrigger) trigger)
                 .hasAdditionalProperties());
     }
 
     @Override
     public String getHandledTriggerTypeDiscriminator() {
-        return "GIVEN_TIME";
+        return "GIVENTIME";
     }
 }
