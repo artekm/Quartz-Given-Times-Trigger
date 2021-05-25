@@ -5,13 +5,16 @@ import org.quartz.spi.MutableTrigger;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.quartz.Trigger.MISFIRE_INSTRUCTION_SMART_POLICY;
+import static pl.artur.quartz.GivenTimesTrigger.ANY_DAY;
 
 public class GivenTimesScheduleBuilder extends ScheduleBuilder<GivenTimesTrigger> {
     private List<LocalTime> fireTimes;
-    private List<DayOfWeek> fireDays;
+    private List<DayOfWeek> fireDays = ANY_DAY;
     private int misfireInstruction = MISFIRE_INSTRUCTION_SMART_POLICY;
 
     protected GivenTimesScheduleBuilder() {
@@ -24,6 +27,11 @@ public class GivenTimesScheduleBuilder extends ScheduleBuilder<GivenTimesTrigger
 
     public GivenTimesScheduleBuilder withFireTimes(List<LocalTime> fireTimes) {
         this.fireTimes = fireTimes;
+        return this;
+    }
+
+    public GivenTimesScheduleBuilder withFireTimes(String... fireTimes) {
+        this.fireTimes = Arrays.stream(fireTimes).map(LocalTime::parse).collect(Collectors.toList());
         return this;
     }
 

@@ -26,7 +26,6 @@ public class GivenTimesPersistenceDelegate extends SimplePropertiesTriggerPersis
         props.setString1(calTrig.getFireTimes().stream().map(LocalTime::toString).collect(Collectors.joining(",")));
         props.setString2(calTrig.getFireDays().stream().map(Enum::toString).collect(Collectors.joining(",")));
 
-        props.setBoolean1(calTrig.continueToday());
         return props;
     }
 
@@ -43,10 +42,8 @@ public class GivenTimesPersistenceDelegate extends SimplePropertiesTriggerPersis
                                                          .withFireDays(fireDays)
                                                          .withFireTimes(fireTimes);
 
-        boolean continueToday = properties.isBoolean1();
-
-        String[] statePropertyNames = {"continueToday"};
-        Object[] statePropertyValues = {continueToday};
+        String[] statePropertyNames = {};
+        Object[] statePropertyValues = {};
         return new TriggerPropertyBundle(sb, statePropertyNames, statePropertyValues);
     }
 

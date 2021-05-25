@@ -1,5 +1,6 @@
 package pl.artur.quartz;
 
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.Calendar;
 import org.quartz.ScheduleBuilder;
 import org.quartz.Trigger;
@@ -8,13 +9,16 @@ import org.quartz.impl.triggers.CoreTrigger;
 
 import java.sql.Timestamp;
 import java.time.*;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 public class GivenTimesTrigger extends AbstractTrigger<GivenTimesTrigger> implements Trigger, CoreTrigger {
     private static final long serialVersionUID = 1234567890L;
     public static final int MISFIRE_INSTRUCTION_FIRE_ONCE_NOW = 1;
     public static final int MISFIRE_INSTRUCTION_DO_NOTHING = 2;
+    public static final List<DayOfWeek> ANY_DAY = Arrays.asList(DayOfWeek.values());
 
     private Date startTime;
     private Date nextFireTime;
@@ -22,8 +26,6 @@ public class GivenTimesTrigger extends AbstractTrigger<GivenTimesTrigger> implem
 
     private List<LocalTime> fireTimes;
     private List<DayOfWeek> fireDays;
-
-    private boolean continueToday = true;
 
     public GivenTimesTrigger() {
         super();
@@ -83,6 +85,7 @@ public class GivenTimesTrigger extends AbstractTrigger<GivenTimesTrigger> implem
             fireTime = getFireTimeAfter(fireTime);
         } while (fireTime != null && fireTime.before(hardStop) &&
                 calendar != null && !calendar.isTimeIncluded(fireTime.getTime()));
+//        log.info("Fire time {}",fireTime);
         return fireTime;
     }
 
@@ -101,10 +104,8 @@ public class GivenTimesTrigger extends AbstractTrigger<GivenTimesTrigger> implem
         LocalTime firstTimeDaily = fireTimes.get(0);
         LocalTime lastTimeDaily = fireTimes.get(fireTimes.size() - 1);
 
-        //continueToday flag is cleared
-        //or
         //time is after last time a day
-        if (!continueToday || !time.isBefore(lastTimeDaily)) {
+        if (!time.isBefore(lastTimeDaily)) {
             do {
                 date = date.plusDays(1);
             } while (!fireDays.contains(date.getDayOfWeek()));
@@ -175,14 +176,6 @@ public class GivenTimesTrigger extends AbstractTrigger<GivenTimesTrigger> implem
     @Override
     public boolean hasAdditionalProperties() {
         return false;
-    }
-
-    public void setContinueToday(boolean continueToday) {
-        this.continueToday = continueToday;
-    }
-
-    public boolean continueToday() {
-        return continueToday;
     }
 
     public List<LocalTime> getFireTimes() {
