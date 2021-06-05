@@ -24,8 +24,9 @@ public class SimpleJob implements Job {
 
     private Trigger rescheduleForTommorow(JobExecutionContext context) throws SchedulerException {
         GivenTimesTrigger trigger = (GivenTimesTrigger) context.getTrigger();
-        GivenTimesTrigger newTrigger = trigger.getTriggerBuilder().build();
-        newTrigger.setStartTime(Timestamp.valueOf(LocalDate.now().plusDays(1).atStartOfDay()));
+        GivenTimesTrigger newTrigger = trigger.getTriggerBuilder()
+                                              .startAt(Timestamp.valueOf(LocalDate.now().plusDays(1).atStartOfDay()))
+                                              .build();
         context.getScheduler().rescheduleJob(trigger.getKey(), newTrigger);
         return newTrigger;
     }
