@@ -22,16 +22,11 @@ public class SimpleJob implements Job {
 //        System.out.println("New next fire time: " + trigger.getNextFireTime());
     }
 
-    private Trigger rescheduleForTommorow(JobExecutionContext context) {
+    private Trigger rescheduleForTommorow(JobExecutionContext context) throws SchedulerException {
         GivenTimesTrigger trigger = (GivenTimesTrigger) context.getTrigger();
-        TriggerBuilder<GivenTimesTrigger> triggerBuilder = trigger.getTriggerBuilder();
-        GivenTimesTrigger newTrigger = triggerBuilder.build();
+        GivenTimesTrigger newTrigger = trigger.getTriggerBuilder().build();
         newTrigger.setStartTime(Timestamp.valueOf(LocalDate.now().plusDays(1).atStartOfDay()));
-        try {
-            context.getScheduler().rescheduleJob(trigger.getKey(), newTrigger);
-        } catch (SchedulerException e) {
-            log.warn("Rescheduling failed");
-        }
+        context.getScheduler().rescheduleJob(trigger.getKey(), newTrigger);
         return newTrigger;
     }
 }
